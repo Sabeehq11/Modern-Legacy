@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: modern_edx
+      POSTGRES_USER: edx_user
+      POSTGRES_PASSWORD: edx_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edx_user -d modern_edx"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  lms:
+    build:
+      context: .
+      dockerfile: docker/lms/Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./services/lms:/app
+      - ./services/shared:/app/shared
+      - lms_static:/app/staticfiles
+      - lms_media:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SETTINGS_MODULE=lms.settings.development
+      - DATABASE_URL=postgresql://edx_user:edx_password@db:5432/modern_edx
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - DEBUG=True
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  cms:
+    build:
+      context: .
+      dockerfile: docker/cms/Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8001"
+    volumes:
+      - ./services/cms:/app
+      - ./services/shared:/app/shared
+      - cms_static:/app/staticfiles
+      - cms_media:/app/media
+    ports:
+      - "8001:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SETTINGS_MODULE=cms.settings.development
+      - DATABASE_URL=postgresql://edx_user:edx_password@db:5432/modern_edx
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/2
+      - DEBUG=True
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  lms-celery:
+    build:
+      context: .
+      dockerfile: docker/lms/Dockerfile
+    command: celery -A lms worker -l info
+    volumes:
+      - ./services/lms:/app
+      - ./services/shared:/app/shared
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SETTINGS_MODULE=lms.settings.development
+      - DATABASE_URL=postgresql://edx_user:edx_password@db:5432/modern_edx
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+
+  cms-celery:
+    build:
+      context: .
+      dockerfile: docker/cms/Dockerfile
+    command: celery -A cms worker -l info
+    volumes:
+      - ./services/cms:/app
+      - ./services/shared:/app/shared
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SETTINGS_MODULE=cms.settings.development
+      - DATABASE_URL=postgresql://edx_user:edx_password@db:5432/modern_edx
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/2
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - lms_static:/var/www/lms/static
+      - cms_static:/var/www/cms/static
+      - lms_media:/var/www/lms/media
+      - cms_media:/var/www/cms/media
+    depends_on:
+      - lms
+      - cms
+
+volumes:
+  postgres_data:
+  redis_data:
+  lms_static:
+  cms_static:
+  lms_media:
+  cms_media:
+
+networks:
+  default:
+    name: modern-edx-network

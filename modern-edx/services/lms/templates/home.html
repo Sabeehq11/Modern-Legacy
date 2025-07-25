@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            opacity: 0.9;
+        }
+        .version {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .feature-card h3 {
+            margin: 0 0 1rem 0;
+            color: #ffd700;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            opacity: 0.8;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ title }}</h1>
+            <p>{{ description }}</p>
+            <div class="version">Version {{ version }}</div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>🚀 Modern Architecture</h3>
+                <ul class="feature-list">
+                    {% for feature in features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎯 Key Features</h3>
+                <ul class="feature-list">
+                    <li>Course management system</li>
+                    <li>Student enrollment & tracking</li>
+                    <li>Assessment & grading tools</li>
+                    <li>Instructor dashboard</li>
+                    <li>Real-time analytics</li>
+                    <li>Mobile-responsive design</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>⚡ Performance</h3>
+                <ul class="feature-list">
+                    <li>High-performance Django backend</li>
+                    <li>Redis caching layer</li>
+                    <li>PostgreSQL database</li>
+                    <li>Horizontal scaling ready</li>
+                    <li>Docker containerization</li>
+                    <li>Nginx load balancing</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/courses/" class="nav-link">Course Catalog</a>
+            {% if user.is_authenticated %}
+                <a href="/students/dashboard/" class="nav-link">Student Dashboard</a>
+                <a href="/courses/my-courses/" class="nav-link">My Courses</a>
+            {% endif %}
+            <a href="/admin/" class="nav-link">Admin Panel</a>
+            <a href="/api/v1/" class="nav-link">API Explorer</a>
+            <a href="/health/" class="nav-link">Health Check</a>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Modern edX Platform - Built with Django 4.2</p>
+            <p>Modernized version of the edX Learning Management System</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Modern edX LMS</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header { text-align: center; margin-bottom: 3rem; }
+        .header h1 { font-size: 3rem; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .dashboard-card {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .card-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 1rem; color: #ffd700; }
+        .stat-item { margin: 0.5rem 0; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .stat-item:last-child { border-bottom: none; }
+        .nav-links { text-align: center; margin-top: 3rem; }
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            margin: 0 1rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+            <p>Your learning dashboard</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-title">📚 Learning Progress</div>
+                <div class="stat-item">
+                    <strong>Courses Completed:</strong> {{ profile.total_courses_completed }}
+                </div>
+                <div class="stat-item">
+                    <strong>Certificates Earned:</strong> {{ profile.total_certificates_earned }}
+                </div>
+                <div class="stat-item">
+                    <strong>Study Hours:</strong> {{ profile.total_study_hours }}
+                </div>
+                <div class="stat-item">
+                    <strong>Current Streak:</strong> {{ profile.current_streak_days }} days
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-title">🎯 Profile Info</div>
+                <div class="stat-item">
+                    <strong>Academic Level:</strong> {{ profile.get_academic_level_display|default:"Not set" }}
+                </div>
+                <div class="stat-item">
+                    <strong>Learning Style:</strong> {{ profile.get_preferred_learning_style_display|default:"Not set" }}
+                </div>
+                <div class="stat-item">
+                    <strong>Study Hours/Week:</strong> {{ profile.study_hours_per_week|default:"Not set" }}
+                </div>
+                <div class="stat-item">
+                    <strong>Last Activity:</strong> {{ profile.last_activity_date|date:"M d, Y"|default:"Never" }}
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-title">🏆 Recent Achievements</div>
+                {% if achievements %}
+                    {% for achievement in achievements %}
+                    <div class="stat-item">
+                        <strong>{{ achievement.get_badge_type_display }}</strong><br>
+                        <small>{{ achievement.description }}</small><br>
+                        <small>Earned: {{ achievement.earned_date|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="stat-item">No achievements yet. Start learning to earn badges!</div>
+                {% endif %}
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-title">📊 Analytics</div>
+                <div class="stat-item">
+                    <strong>Total Time Spent:</strong> {{ analytics.total_time_spent }}
+                </div>
+                <div class="stat-item">
+                    <strong>Sessions:</strong> {{ analytics.sessions_count }}
+                </div>
+                <div class="stat-item">
+                    <strong>Completion Rate:</strong> {{ analytics.completion_rate }}%
+                </div>
+                <div class="stat-item">
+                    <strong>Most Active Day:</strong> {{ analytics.most_active_day_of_week|default:"Not tracked" }}
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link">← Home</a>
+            <a href="{% url 'courses:catalog' %}" class="nav-link">Course Catalog</a>
+            <a href="{% url 'courses:my_courses' %}" class="nav-link">My Courses</a>
+            <a href="{% url 'students:profile' %}" class="nav-link">My Profile</a>
+            <a href="{% url 'students:achievements' %}" class="nav-link">Achievements</a>
+        </div>
+    </div>
+</body>
+</html>
