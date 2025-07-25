@@ -1,0 +1,320 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+<style>
+    /* Form Container */
+    form {
+        max-width: 1200px;
+    }
+    
+    /* Fieldsets */
+    fieldset {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    fieldset h2 {
+        background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+        color: var(--dark);
+        padding: 1rem 1.5rem;
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .form-row {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .form-row:last-child {
+        border-bottom: none;
+    }
+    
+    .form-row > div {
+        display: flex;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .form-row label {
+        width: 200px;
+        font-weight: 600;
+        color: var(--dark);
+        padding-top: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .form-row .flex-container {
+        flex: 1;
+    }
+    
+    /* Form Elements */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="url"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="time"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+        width: 100%;
+        max-width: 500px;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--gray-300);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: var(--white);
+    }
+    
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus,
+    input[type="url"]:focus,
+    input[type="number"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus,
+    input[type="datetime-local"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+    }
+    
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    /* Checkboxes and Radio Buttons */
+    input[type="checkbox"],
+    input[type="radio"] {
+        margin-right: 0.5rem;
+    }
+    
+    .checkbox-row {
+        padding: 0.5rem 0;
+    }
+    
+    /* Help Text */
+    .help,
+    .form-row p.help {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        line-height: 1.5;
+    }
+    
+    /* Inline Groups */
+    .inline-group {
+        margin-top: 2rem;
+    }
+    
+    .inline-group .tabular {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .inline-group h2 {
+        background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+        color: var(--dark);
+        padding: 1rem 1.5rem;
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    /* Error Styling */
+    .errorlist {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    
+    .errorlist li {
+        background: rgba(231, 76, 60, 0.1);
+        color: var(--danger);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+    
+    .form-row.errors {
+        background: rgba(231, 76, 60, 0.05);
+    }
+    
+    .form-row.errors input,
+    .form-row.errors textarea,
+    .form-row.errors select {
+        border-color: var(--danger);
+    }
+    
+    /* Submit Row */
+    .submit-row {
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-top: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        align-items: center;
+        border: 1px solid var(--gray-200);
+    }
+    
+    .submit-row input[type="submit"] {
+        order: 1;
+    }
+    
+    .submit-row .deletelink-box {
+        order: -1;
+        margin-right: auto;
+    }
+    
+    .submit-row .deletelink-box .deletelink {
+        background: linear-gradient(135deg, var(--danger) 0%, #C0392B 100%);
+    }
+    
+    /* Required Fields */
+    .required {
+        font-weight: bold;
+        color: var(--danger);
+    }
+    
+    /* Responsive */
+    @media (max-width: 767px) {
+        .form-row {
+            flex-direction: column;
+        }
+        
+        .form-row label {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="url"],
+        input[type="number"],
+        textarea,
+        select {
+            max-width: 100%;
+        }
+        
+        .submit-row {
+            flex-direction: column;
+        }
+        
+        .submit-row .deletelink-box {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+    }
+    
+    /* Date Time Shortcuts */
+    .datetimeshortcuts {
+        margin-left: 0.5rem;
+    }
+    
+    .datetimeshortcuts a {
+        color: var(--primary);
+        margin: 0 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+&rsaquo; {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div id="content-main">
+    <h1 style="font-size: 2rem; font-weight: 700; color: var(--dark); margin-bottom: 2rem;">
+        {% if add %}
+            {% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}
+        {% else %}
+            {% blocktrans with name=opts.verbose_name %}Change {{ name }}{% endblocktrans %}
+        {% endif %}
+    </h1>
+    
+    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+    <div>
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+        {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+        {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+        {% if errors %}
+            <p class="errornote">
+            {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+            </p>
+            {{ adminform.form.non_field_errors }}
+        {% endif %}
+
+        {% block field_sets %}
+        {% for fieldset in adminform %}
+          {% include "admin/includes/fieldset.html" %}
+        {% endfor %}
+        {% endblock %}
+
+        {% block after_field_sets %}{% endblock %}
+
+        {% block inline_field_sets %}
+        {% for inline_admin_formset in inline_admin_formsets %}
+            {% include inline_admin_formset.opts.template %}
+        {% endfor %}
+        {% endblock %}
+
+        {% block after_related_objects %}{% endblock %}
+
+        {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+        {% block admin_change_form_document_ready %}
+            <script type="text/javascript"
+                    id="django-admin-form-add-constants"
+                    src="{% static 'admin/js/change_form.js' %}"
+                    {% if adminform and add %}
+                        data-model-name="{{ opts.model_name }}"
+                    {% endif %}>
+            </script>
+        {% endblock %}
+
+        {# JavaScript for prepopulated fields #}
+        {% prepopulated_fields_js %}
+
+    </div>
+    </form>
+</div>
+{% endblock %} 

@@ -1,0 +1,162 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content-main">
+    
+    <!-- Welcome Section -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">
+            Welcome to Modern edX LMS Administration
+        </h2>
+        <p style="color: var(--gray-600); font-size: 1.1rem;">
+            Manage your courses, students, instructors, and platform settings from this central dashboard.
+        </p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <h3>Total Courses</h3>
+            <div class="count">{{ course_count|default:"0" }}</div>
+            <p style="color: var(--gray-600); margin: 0;">Active courses in the platform</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>Total Students</h3>
+            <div class="count">{{ student_count|default:"0" }}</div>
+            <p style="color: var(--gray-600); margin: 0;">Registered learners</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>Total Instructors</h3>
+            <div class="count">{{ instructor_count|default:"0" }}</div>
+            <p style="color: var(--gray-600); margin: 0;">Teaching professionals</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>Enrollments</h3>
+            <div class="count">{{ enrollment_count|default:"0" }}</div>
+            <p style="color: var(--gray-600); margin: 0;">Course enrollments</p>
+        </div>
+    </div>
+
+    <!-- App List with Modern Card Design -->
+    {% if app_list %}
+        {% for app in app_list %}
+            <div class="module" style="margin-bottom: 2rem;">
+                <h2 style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
+                    <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}" style="color: white;">{{ app.name }}</a>
+                </h2>
+                
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 40%;">Model</th>
+                            <th scope="col" style="width: 20%; text-align: center;">Total Records</th>
+                            <th scope="col" style="width: 40%; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for model in app.models %}
+                        <tr>
+                            <td>
+                                {% if model.admin_url %}
+                                    <a href="{{ model.admin_url }}" style="font-weight: 600;">{{ model.name }}</a>
+                                {% else %}
+                                    <span style="font-weight: 600;">{{ model.name }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: center;">
+                                <span style="background: var(--gray-200); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem;">
+                                    {{ model.object_count|default:"0" }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                {% if model.add_url %}
+                                    <a href="{{ model.add_url }}" class="addlink" style="margin-right: 0.5rem;">
+                                        Add
+                                    </a>
+                                {% endif %}
+                                {% if model.admin_url %}
+                                    {% if model.view_only %}
+                                        <a href="{{ model.admin_url }}" class="viewlink">View</a>
+                                    {% else %}
+                                        <a href="{{ model.admin_url }}" class="changelink">
+                                            Change
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>{% trans "You don't have permission to view or edit anything." %}</p>
+    {% endif %}
+    
+    <!-- Quick Actions Section -->
+    <div class="module" style="margin-top: 3rem;">
+        <h2>Quick Actions</h2>
+        <div style="padding: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <a href="/admin/courses/course/add/" class="button" style="text-align: center;">
+                    + Add New Course
+                </a>
+                <a href="/admin/auth/user/add/" class="button" style="text-align: center;">
+                    + Add New User
+                </a>
+                <a href="/admin/students/studentprofile/" class="button" style="text-align: center;">
+                    View Students
+                </a>
+                <a href="/admin/courses/courseenrollment/" class="button" style="text-align: center;">
+                    Manage Enrollments
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% trans 'Recent actions' %}</h2>
+        <h3>{% trans 'My actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as admin_log for_user user %}
+        {% if not admin_log %}
+            <p style="padding: 1rem 1.5rem; color: var(--gray-600);">{% trans 'None available' %}</p>
+        {% else %}
+            <ul class="actionlist">
+                {% for entry in admin_log %}
+                <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                    {% if entry.is_deletion or not entry.get_admin_url %}
+                        {{ entry.object_repr }}
+                    {% else %}
+                        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                    {% endif %}
+                    <br>
+                    {% if entry.content_type %}
+                        <span class="mini quiet">{{ entry.content_type }}</span>
+                    {% else %}
+                        <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <!-- System Information -->
+    <div class="module" style="margin-top: 2rem;">
+        <h2>System Information</h2>
+        <div style="padding: 1rem 1.5rem;">
+            <p style="margin: 0.5rem 0;"><strong>Platform:</strong> Modern edX LMS</p>
+            <p style="margin: 0.5rem 0;"><strong>Version:</strong> 1.0.0</p>
+            <p style="margin: 0.5rem 0;"><strong>Django:</strong> 4.2</p>
+            <p style="margin: 0.5rem 0;"><strong>Database:</strong> PostgreSQL</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

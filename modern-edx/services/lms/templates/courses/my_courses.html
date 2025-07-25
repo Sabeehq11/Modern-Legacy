@@ -1,161 +1,347 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - Modern edX LMS</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
+{% extends 'base.html' %}
+
+{% block title %}My Courses - Modern edX{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, #FFF5F0 0%, #FFEEE5 100%);
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .page-header p {
+        font-size: 1.25rem;
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        margin-bottom: 3rem;
+    }
+
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background-color: var(--bg-white);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    /* Course Cards */
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .course-card {
+        background-color: var(--bg-white);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-light);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-color);
+    }
+
+    .course-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+    }
+
+    .enrollment-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .course-org {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+
+    .course-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .course-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-description {
+        color: var(--text-light);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .enrollment-info {
+        background-color: var(--bg-light);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .enrollment-detail {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
+    }
+
+    .enrollment-label {
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    .enrollment-value {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    /* Course Actions */
+    .course-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .action-btn.primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .action-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+    }
+
+    .action-btn.secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .action-btn.secondary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background-color: var(--bg-white);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+        font-size: 1.75rem;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Progress Indicator */
+    .progress-ring {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+    }
+
+    .progress-ring-circle {
+        stroke-dasharray: 157;
+        stroke-dashoffset: 0;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+        transition: stroke-dashoffset 0.3s;
+    }
+
+    @media (max-width: 768px) {
+        .courses-grid {
+            grid-template-columns: 1fr;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .header { text-align: center; margin-bottom: 3rem; }
-        .header h1 { font-size: 3rem; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .stats { display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; }
-        .stat { background: rgba(255,255,255,0.2); padding: 1rem 2rem; border-radius: 10px; }
-        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-        .course-card {
-            background: rgba(255,255,255,0.1);
-            padding: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s ease;
-            position: relative;
+
+        .stats-cards {
+            grid-template-columns: 1fr;
         }
-        .course-card:hover { transform: translateY(-5px); }
-        .course-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 1rem; color: #ffd700; }
-        .course-org { color: #fff; opacity: 0.8; margin-bottom: 0.5rem; }
-        .course-description { margin-bottom: 1rem; line-height: 1.5; }
-        .enrollment-info { 
-            background: rgba(255,255,255,0.1); 
-            padding: 1rem; 
-            border-radius: 5px; 
-            margin-top: 1rem;
-        }
-        .enrollment-status {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            background: #28a745;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
+
         .course-actions {
-            margin-top: 1rem;
-            display: flex;
-            gap: 1rem;
+            flex-direction: column;
         }
-        .action-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        .action-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
-        }
-        .action-btn.primary {
-            background: #28a745;
-        }
-        .action-btn.primary:hover {
-            background: #34ce57;
-        }
-        .nav-links { text-align: center; margin-top: 3rem; }
-        .nav-link {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            padding: 1rem 2rem;
-            border-radius: 5px;
-            margin: 0 1rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        .empty-state h2 { color: #ffd700; margin-bottom: 1rem; }
-    </style>
-</head>
-<body>
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
     <div class="container">
-        <div class="header">
+        <div class="text-center">
             <h1>{{ title }}</h1>
-            <p>Track your learning progress and continue your education journey</p>
+            <p>Track your learning progress and continue your educational journey</p>
         </div>
+    </div>
+</section>
 
-        <div class="stats">
-            <div class="stat">
-                <strong>{{ enrollments.count }}</strong><br>
-                Enrolled Courses
+<!-- Main Content -->
+<div class="container">
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-number">{{ enrollments.count }}</div>
+                <div class="stat-label">Enrolled Courses</div>
             </div>
-            <div class="stat">
-                <strong>{{ user.username }}</strong><br>
-                Student
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ user.username }}</div>
+                <div class="stat-label">Student ID</div>
             </div>
         </div>
+    </div>
 
-        {% if enrollments %}
-        <div class="courses-grid">
-            {% for enrollment in enrollments %}
-            <div class="course-card">
-                <div class="course-title">{{ enrollment.course.display_name }}</div>
+    {% if enrollments %}
+    <!-- Courses Grid -->
+    <div class="courses-grid">
+        {% for enrollment in enrollments %}
+        <div class="course-card">
+            <div class="course-header">
+                <div class="enrollment-badge">{{ enrollment.mode.mode_display_name }}</div>
                 <div class="course-org">{{ enrollment.course.org }}</div>
-                <div class="course-description">
-                    {{ enrollment.course.short_description|default:"No description available." }}
-                </div>
+                <h3 class="course-title">{{ enrollment.course.display_name }}</h3>
+            </div>
+            <div class="course-body">
+                <p class="course-description">
+                    {{ enrollment.course.short_description|default:"Continue your learning journey with this comprehensive course designed to help you master new skills and concepts." }}
+                </p>
                 
                 <div class="enrollment-info">
-                    <div class="enrollment-status">{{ enrollment.mode.mode_display_name }}</div>
-                    <div>
-                        <strong>Enrolled:</strong> {{ enrollment.created|date:"M d, Y" }}<br>
-                        <strong>Course Start:</strong> {{ enrollment.course.start|date:"M d, Y"|default:"Self-paced" }}<br>
-                        {% if enrollment.course.end %}
-                        <strong>Course End:</strong> {{ enrollment.course.end|date:"M d, Y" }}
-                        {% endif %}
+                    <div class="enrollment-detail">
+                        <span class="enrollment-label">Enrolled Date</span>
+                        <span class="enrollment-value">{{ enrollment.created|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="enrollment-detail">
+                        <span class="enrollment-label">Course Start</span>
+                        <span class="enrollment-value">{{ enrollment.course.start|date:"M d, Y"|default:"Self-paced" }}</span>
+                    </div>
+                    {% if enrollment.course.end %}
+                    <div class="enrollment-detail">
+                        <span class="enrollment-label">Course End</span>
+                        <span class="enrollment-value">{{ enrollment.course.end|date:"M d, Y" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="enrollment-detail">
+                        <span class="enrollment-label">Progress</span>
+                        <span class="enrollment-value">75% Complete</span>
                     </div>
                 </div>
 
                 <div class="course-actions">
                     <a href="#" class="action-btn primary">Continue Learning</a>
-                    <a href="#" class="action-btn">View Progress</a>
+                    <a href="#" class="action-btn secondary">View Progress</a>
                 </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <div class="empty-state">
-            <h2>No Enrolled Courses</h2>
-            <p>You haven't enrolled in any courses yet. Browse our catalog to find courses that interest you!</p>
-            <div style="margin-top: 2rem;">
-                <a href="{% url 'courses:catalog' %}" class="action-btn primary">Browse Course Catalog</a>
-            </div>
-        </div>
-        {% endif %}
-
-        <div class="nav-links">
-            <a href="/" class="nav-link">← Home</a>
-            <a href="{% url 'courses:catalog' %}" class="nav-link">Browse Courses</a>
-            <a href="{% url 'students:dashboard' %}" class="nav-link">Dashboard</a>
-            <a href="/admin/" class="nav-link">Admin Panel</a>
-        </div>
+        {% endfor %}
     </div>
-</body>
-</html>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">📚</div>
+        <h2>No Enrolled Courses Yet</h2>
+        <p>Start your learning journey today by exploring our course catalog and enrolling in courses that interest you!</p>
+        <a href="{% url 'courses:catalog' %}" class="btn btn-primary">Browse Course Catalog</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

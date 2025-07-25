@@ -1,135 +1,354 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .header h1 {
-            font-size: 3rem;
-            margin: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .header p {
-            font-size: 1.2rem;
-            margin: 1rem 0;
-            opacity: 0.9;
-        }
-        .version {
-            background: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 1rem;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        .feature-card {
-            background: rgba(255,255,255,0.1);
-            padding: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .feature-card h3 {
-            margin: 0 0 1rem 0;
-            color: #ffd700;
-        }
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-        .feature-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-        .feature-list li:before {
-            content: "✓ ";
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        .nav-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        .nav-link {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            padding: 1rem 2rem;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .nav-link:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-        .footer {
-            text-align: center;
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            opacity: 0.8;
-        }
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            .nav-links {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>{{ title }}</h1>
-            <p>{{ description }}</p>
-            <div class="version">Version {{ version }}</div>
-        </div>
+{% extends 'base.html' %}
 
-        <div class="features">
+{% block title %}Modern edX - Future of Learning Today{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, #FFF5F0 0%, #FFEEE5 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        min-height: 500px;
+    }
+
+    .hero-text h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        color: var(--text-dark);
+    }
+
+    .hero-text h1 span {
+        color: var(--primary-color);
+    }
+
+    .hero-text p {
+        font-size: 1.25rem;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+        line-height: 1.8;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-visual {
+        position: relative;
+    }
+
+    .hero-circles {
+        width: 100%;
+        max-width: 500px;
+        height: 500px;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .circle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.9;
+    }
+
+    .circle-1 {
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, #FFE5D0 0%, #FFD4B2 100%);
+        top: 50px;
+        left: 50px;
+    }
+
+    .circle-2 {
+        width: 350px;
+        height: 350px;
+        background: linear-gradient(135deg, #FFCBA4 0%, #FFB380 100%);
+        top: 75px;
+        left: 75px;
+    }
+
+    .circle-3 {
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, #FF9F5C 0%, #FF8B3D 100%);
+        top: 100px;
+        left: 100px;
+    }
+
+    .circle-4 {
+        width: 250px;
+        height: 250px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        top: 125px;
+        left: 125px;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        padding: 4rem 0;
+        background-color: var(--bg-white);
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 3rem;
+        text-align: center;
+    }
+
+    .stat-card {
+        padding: 2rem;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1.25rem;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .stat-description {
+        color: var(--text-light);
+        margin-top: 0.5rem;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 5rem 0;
+        background-color: var(--bg-light);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-header h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .section-header p {
+        font-size: 1.25rem;
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background-color: var(--bg-white);
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-light);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-color);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, rgba(230, 126, 34, 0.1) 0%, rgba(211, 84, 0, 0.1) 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .feature-card ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .feature-card li {
+        padding: 0.5rem 0;
+        color: var(--text-light);
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .feature-card li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--success-color);
+        font-weight: bold;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        text-align: center;
+    }
+
+    .cta-content h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .btn-white {
+        background-color: white;
+        color: var(--primary-color);
+        padding: 1rem 2.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .hero-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .hero-text h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-visual {
+            display: none;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Future of your <span>learning</span> today.</h1>
+                <p>Where we elevate your education with innovative strategies and expert solutions. As a full-service learning platform, we specialize in helping learners of all ages optimize their educational journey.</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'courses:catalog' %}" class="btn btn-primary">Browse Courses</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-circles">
+                    <div class="circle circle-1"></div>
+                    <div class="circle circle-2"></div>
+                    <div class="circle circle-3"></div>
+                    <div class="circle circle-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">721+</div>
+                <div class="stat-label">Active Courses</div>
+                <div class="stat-description">Growth in our course catalog</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Students Enrolled</div>
+                <div class="stat-description">Learners achieving their goals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2000+</div>
+                <div class="stat-label">Hours of Content</div>
+                <div class="stat-description">Quality educational materials</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">Expert Instructors</div>
+                <div class="stat-description">Industry professionals teaching</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="container">
+        <div class="section-header">
+            <h2>Build the future of your education</h2>
+            <p>As a full-service learning platform, we specialize in helping learners of all ages optimize their educational journey.</p>
+        </div>
+        
+        <div class="features-grid">
             <div class="feature-card">
-                <h3>🚀 Modern Architecture</h3>
-                <ul class="feature-list">
+                <div class="feature-icon">🚀</div>
+                <h3>Modern Architecture</h3>
+                <ul>
                     {% for feature in features %}
                     <li>{{ feature }}</li>
                     {% endfor %}
                 </ul>
             </div>
-
+            
             <div class="feature-card">
-                <h3>🎯 Key Features</h3>
-                <ul class="feature-list">
+                <div class="feature-icon">🎯</div>
+                <h3>Key Features</h3>
+                <ul>
                     <li>Course management system</li>
                     <li>Student enrollment & tracking</li>
                     <li>Assessment & grading tools</li>
@@ -138,10 +357,11 @@
                     <li>Mobile-responsive design</li>
                 </ul>
             </div>
-
+            
             <div class="feature-card">
-                <h3>⚡ Performance</h3>
-                <ul class="feature-list">
+                <div class="feature-icon">⚡</div>
+                <h3>Performance</h3>
+                <ul>
                     <li>High-performance Django backend</li>
                     <li>Redis caching layer</li>
                     <li>PostgreSQL database</li>
@@ -151,22 +371,17 @@
                 </ul>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="nav-links">
-            <a href="/courses/" class="nav-link">Course Catalog</a>
-            {% if user.is_authenticated %}
-                <a href="/students/dashboard/" class="nav-link">Student Dashboard</a>
-                <a href="/courses/my-courses/" class="nav-link">My Courses</a>
-            {% endif %}
-            <a href="/admin/" class="nav-link">Admin Panel</a>
-            <a href="/api/v1/" class="nav-link">API Explorer</a>
-            <a href="/health/" class="nav-link">Health Check</a>
-        </div>
-
-        <div class="footer">
-            <p>&copy; 2024 Modern edX Platform - Built with Django 4.2</p>
-            <p>Modernized version of the edX Learning Management System</p>
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>We are here to help your learning journey</h2>
+            <p>As a full-service learning platform, we specialize in helping learners of all ages optimize their educational experience.</p>
+            <a href="{% url 'courses:catalog' %}" class="btn-white">Start Learning Today</a>
         </div>
     </div>
-</body>
-</html>
+</section>
+{% endblock %}
